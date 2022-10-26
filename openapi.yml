@@ -1,0 +1,186 @@
+openapi: 3.0.3
+info:
+  title: Personas APIs Definition
+  description: |
+      # About Us
+      **Persona Builder** Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+  termsOfService: https://persona.com/terms/
+  contact:
+    name: API Support
+    url: https://www.personas.com/support
+    email: support@personas.com
+  license:
+    name: Persona License
+    url: https://www.personsa.com/licenses/LICENSE-2.0.html
+  version: 0.0.1
+servers:
+  - url: https://staging.personas.com/v1
+    description: staging server
+security:
+  - ApiKeyAuth: []
+paths:
+  /personas:
+    post:
+      tags:
+        - Personas - management from the Cookie3 dashboard
+      summary: Create Persona
+      description: Create Persona for specific user
+      operationId: savePersona
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                newPersona:
+                    $ref: "#/components/schemas/Persona"
+      responses:
+        '201':
+          description: Persona created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  personaId:
+                    type: integer
+        '500':
+          $ref: "#/components/responses/InternalServerError"
+    put:
+      tags:
+        - Personas - management from the Cookie3 dashboard
+      summary: Update Persona
+      description: Update specific user Persona
+      operationId: updatePersona
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                personaId:
+                  type: integer
+                updateData:
+                    $ref: "#/components/schemas/Persona"
+      responses:
+        '200':
+          description: Persona details updated successfully
+        '500':
+          $ref: "#/components/responses/InternalServerError"
+    delete:
+      tags:
+        - Personas - management from the Cookie3 dashboard
+      summary: Delete Persona
+      description: Delete Persona for specific user
+      operationId: deletePersona
+      parameters:
+        - $ref: "#/components/parameters/personaIdQueryParam"
+      responses:
+        '204':
+          description: Persona deleted successfully
+        '500':
+          $ref: "#/components/responses/InternalServerError"
+    get:
+      tags:
+        - Personas - management from the Cookie3 dashboard
+      summary: List of all user personas
+      description: List of all user personas(default the same for everybody + predefined)
+      operationId: getPersonas
+      responses:
+        '200':
+          description: A list of personas
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Persona"
+              examples:
+                all-categories-data:
+                  summary: Personas list example data
+                  value:
+                    - id: 101
+                      name: DAO Voter
+                      type: default
+                      createdAt: 2022-10-26T11:47:57.826Z
+                      attributes: {}
+                      conditions: {}
+                    - id: 102
+                      name: Persona A
+                      type: predefined
+                      createdAt: 2022-09-26T11:47:57.826Z
+                      attributes: {}
+                      conditions: {}  
+        '500':
+          $ref: "#/components/responses/InternalServerError"
+  /personas/comparison:
+    get:
+      tags:
+        - Personas - read only SDK
+      summary: Compare wallet address with Persona
+      description: Compare your wallet address with Persona to see if it meets the criteria
+      operationId: getWalletPersonaComparison
+      parameters:
+        - $ref: "#/components/parameters/personaIdQueryParam"
+        - $ref: "#/components/parameters/walletAddressQueryParam"
+      responses:
+        '200':
+          description: Wallet with Persona compared successfully
+          content:
+            application/json:
+              schema: 
+                type: object
+                properties:
+                  isMatchedPersona:
+                    type: boolean
+        '500':
+          $ref: "#/components/responses/InternalServerError"
+components:
+  securitySchemes:
+    ApiKeyAuth:        
+      type: apiKey
+      in: header
+      name: X-API-KEY
+  schemas:
+    Persona:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+        type:
+          type: string
+          enum:
+            - default
+            - predefined
+          readOnly: true
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+        attributes:
+          type: object
+        conditions:
+          type: object
+  parameters:
+    personaIdQueryParam:
+      name: personaId
+      in: query
+      required: true
+      schema:
+        type: integer
+    walletAddressQueryParam:
+      name: walletAddress
+      in: query
+      required: true
+      schema:
+        type: integer
+  responses:
+    InternalServerError:
+      description: |
+        An error occured while processing the request.
+        Please contact support@personas.com
+  
+            

@@ -1,0 +1,236 @@
+openapi: 3.0.3
+info:
+  title: Personas APIs Definition
+  description: |
+    # About Us
+    **Persona Builder** Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+  termsOfService: https://persona.com/terms/
+  contact:
+    name: API Support
+    url: https://www.personas.com/support
+    email: support@personas.com
+  license:
+    name: Persona License
+    url: https://www.personsa.com/licenses/LICENSE-2.0.html
+  version: 0.0.1
+servers:
+- url: https://staging.personas.com/v1
+  description: staging server
+security:
+- ApiKeyAuth: []
+paths:
+  /personas:
+    get:
+      tags:
+      - Personas - management from the Cookie3 dashboard
+      summary: List of all user personas
+      description: List of all user personas(default the same for everybody + predefined)
+      operationId: getPersonas
+      responses:
+        "200":
+          description: A list of personas
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Persona'
+                x-content-type: application/json
+              examples:
+                all-categories-data:
+                  summary: Personas list example data
+                  value:
+                  - id: 101
+                    name: DAO Voter
+                    type: default
+                    createdAt: 2022-10-26T11:47:57.826Z
+                    attributes: {}
+                    conditions: {}
+                  - id: 102
+                    name: Persona A
+                    type: predefined
+                    createdAt: 2022-09-26T11:47:57.826Z
+                    attributes: {}
+                    conditions: {}
+        "500":
+          description: "An error occured while processing the request.\nPlease contact\
+            \ support@personas.com\n\n    \n"
+      x-swagger-router-controller: PersonasManagementFromTheCookie3Dashboard
+    put:
+      tags:
+      - Personas - management from the Cookie3 dashboard
+      summary: Update Persona
+      description: Update specific user Persona
+      operationId: updatePersona
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/personas_body'
+      responses:
+        "200":
+          description: Persona details updated successfully
+        "500":
+          description: "An error occured while processing the request.\nPlease contact\
+            \ support@personas.com\n\n    \n"
+      x-swagger-router-controller: PersonasManagementFromTheCookie3Dashboard
+    post:
+      tags:
+      - Personas - management from the Cookie3 dashboard
+      summary: Create Persona
+      description: Create Persona for specific user
+      operationId: savePersona
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/personas_body_1'
+      responses:
+        "201":
+          description: Persona created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_201'
+        "500":
+          description: "An error occured while processing the request.\nPlease contact\
+            \ support@personas.com\n\n    \n"
+      x-swagger-router-controller: PersonasManagementFromTheCookie3Dashboard
+    delete:
+      tags:
+      - Personas - management from the Cookie3 dashboard
+      summary: Delete Persona
+      description: Delete Persona for specific user
+      operationId: deletePersona
+      parameters:
+      - name: personaId
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: integer
+      responses:
+        "204":
+          description: Persona deleted successfully
+        "500":
+          description: "An error occured while processing the request.\nPlease contact\
+            \ support@personas.com\n\n    \n"
+      x-swagger-router-controller: PersonasManagementFromTheCookie3Dashboard
+  /personas/comparison:
+    get:
+      tags:
+      - Personas - read only SDK
+      summary: Compare wallet address with Persona
+      description: Compare your wallet address with Persona to see if it meets the
+        criteria
+      operationId: getWalletPersonaComparison
+      parameters:
+      - name: personaId
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: integer
+      - name: walletAddress
+        in: query
+        required: true
+        style: form
+        explode: true
+        schema:
+          type: integer
+      responses:
+        "200":
+          description: Wallet with Persona compared successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/inline_response_200'
+        "500":
+          description: "An error occured while processing the request.\nPlease contact\
+            \ support@personas.com\n\n    \n"
+      x-swagger-router-controller: PersonasReadOnlySDK
+components:
+  schemas:
+    Persona:
+      type: object
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        name:
+          type: string
+        type:
+          type: string
+          readOnly: true
+          enum:
+          - default
+          - predefined
+        createdAt:
+          type: string
+          format: date-time
+          readOnly: true
+        attributes:
+          type: object
+        conditions:
+          type: object
+      example:
+        createdAt: 2000-01-23T04:56:07.000+00:00
+        name: name
+        attributes: {}
+        id: 0
+        type: default
+        conditions: {}
+    personas_body:
+      type: object
+      properties:
+        personaId:
+          type: integer
+        updateData:
+          $ref: '#/components/schemas/Persona'
+    personas_body_1:
+      type: object
+      properties:
+        newPersona:
+          $ref: '#/components/schemas/Persona'
+    inline_response_201:
+      type: object
+      properties:
+        personaId:
+          type: integer
+      example:
+        personaId: 0
+    inline_response_200:
+      type: object
+      properties:
+        isMatchedPersona:
+          type: boolean
+      example:
+        isMatchedPersona: true
+  responses:
+    InternalServerError:
+      description: "An error occured while processing the request.\nPlease contact\
+        \ support@personas.com\n\n    \n"
+  parameters:
+    personaIdQueryParam:
+      name: personaId
+      in: query
+      required: true
+      style: form
+      explode: true
+      schema:
+        type: integer
+    walletAddressQueryParam:
+      name: walletAddress
+      in: query
+      required: true
+      style: form
+      explode: true
+      schema:
+        type: integer
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      name: X-API-KEY
+      in: header
